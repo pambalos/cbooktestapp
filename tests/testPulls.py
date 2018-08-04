@@ -4,7 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
-from flask_oauthlib.client import Oauth
+from flask_oauthlib.client import OAuth
+from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] =' 67aGHYDS8c7S8CGcaydw878csa7887bac' #setting secret key
@@ -17,9 +18,15 @@ params = {
     'redirect_uri': callback
 }
 
-client = BackendApplicationClient(client_id = cid)
-oauth = requests.Session(client_id = client)
-token = oauth.fetch_token(token_url = urlToken, client_id = cid, client_secret = apisecret)
+
+#Authorization through user-agent, currently sends out right, not sure about response
+oauth = OAuth2Session(cid, redirect_uri = callback, scope = 'check')
+authorization_url, state = oauth.authorization_url(req_url)
+print ('please go to %s and authorize' % authorization_url)
+print('auth_respone is given as:')
+auth_resp = input(callback)
+print(auth_resp)
+
 
 response = requests.request("GET", 'https://checkbook.io/oauth/authorize', headers = params)
 print('Attempt using requests results in:')
