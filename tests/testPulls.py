@@ -1,7 +1,7 @@
 from keys import *
 import requests, json
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, url_for, flash, redirect
+from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
 from flask_oauthlib.client import Oauth
