@@ -7,7 +7,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-
+    {{ form.hidden_tag() }}
     {% if title %}
         <title>Test - {{ title }}</title>
     {% else %}
@@ -20,7 +20,7 @@
         <div class="col-md-6">
         </div>
         <div class = "form-group">
-          {{ submit(class="btn btn-outline-info") }}
+          {{ form.submit(class="btn btn-outline-info") }}
         </div>
         <div class="col-md-4">
           <div class="content-section">
