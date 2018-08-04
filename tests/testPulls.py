@@ -18,20 +18,6 @@ params = {
     'redirect_uri': callback
 }
 
-
-#Authorization through user-agent, currently sends out right, not sure about response
-oauth = OAuth2Session(cid, redirect_uri = callback, scope = 'check')
-authorization_url, state = oauth.authorization_url(req_url)
-print ('please go to %s and authorize' % authorization_url)
-print('auth_respone is given as:')
-auth_resp = input(callback)
-print(auth_resp)
-
-
-response = requests.request("GET", 'https://checkbook.io/oauth/authorize', headers = params)
-print('Attempt using requests results in:')
-print(response)
-
 #attempt two
 heads_test = {"Content-Type" : "application/json", "X-Accept" : "application/json"}
 payload = {"client_id" : cid, "redirect_uri" : callback}
@@ -47,6 +33,22 @@ def home():
         flash('Submitted', 'success')
         return redirect();
     return render_template('layout.html', title = 'Test', form = form)
+
+#Authorization through user-agent, currently sends out right, not sure about response
+oauth = OAuth2Session(cid, redirect_uri = callback, scope = 'check')
+authorization_url, state = oauth.authorization_url(req_url)
+response_oauth = requests.request("GET", authorization_url, headers = params)
+print ('Authorization_url: %s' % authorization_url)
+print('response_oauth is given as: %s' % response_oauth)
+print(response_oauth.text)
+# auth_resp = input(callback)
+# print(auth_resp)
+
+
+response = requests.request("GET", 'https://checkbook.io/oauth/authorize', headers = params)
+print('Attempt using requests results in:')
+print(response)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
