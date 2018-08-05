@@ -1,10 +1,10 @@
-callback = 'http://127.0.0.1:5000/'
+callback = 'http://127.0.0.1:5000/home'
 cid = 'a110738a6c9248638dcdf8be283d3bcb'
 req_url = "https://checkbook.io/oauth/authorize"
 urlB = "https://demo.checkbook.io/v3/check"
-apikey = 'e3c43713fd6746f8836bd9361ac0b954'
-apisecret = 'QwqvFVhhyRqjBl2zej4V5pU60HoOWf'
+apikey = '85a7b1b4eddc5831ea74783b6ca5d2cd'
+apisecret = 'aa3b3a097f4d217377422729e84a37ce'
 webhhook = '9c42446d969446bdb0f796e9bd355301'
 urlToken = 'https://checkbook.io/oauth/token'
 authc = 'FwKCy5ICrWqGa8TwOjFmXQPFx8Z10G'
-client_secret = '67aGHYDS8c7S8CGcaydw878csa7887bac'
+client_secret = 'sZWjFJmyFQnzkVMxbFCTbByZNJhaJV'
