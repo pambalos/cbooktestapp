@@ -24,22 +24,19 @@ paramstwo = {
     'client_id' : cid,
     'grant_type' : authc,
 }
-'''
-#Attempting to get authorization following Backend Application flow
-auth = HTTPBasicAuth(cid, client_secret)
-client = BackendApplicationClient(client_id=cid)
-oauth = OAuth2Session(client = client)
-token = oauth.fetch_token(token_url = urlToken, auth = auth, )
-print('Retrieved Token')
-# Only ever results in unauthorized client response...
-'''
 
 urlcheck = "https://sandbox.checkbook.io/v3/check"
-headers = {
+headers_one = {
   'Accept': 'application/json',
   'Authorization': (apikey + ':' + apisecret)
 }
-response = requests.request("GET", urlcheck, headers=headers)
+
+headers_two = {
+  'Content-Type': 'application/json',
+  'Authorization': (apikey + ':' + apisecret)
+}
+
+response = requests.request("GET", urlcheck, headers=headers_one)
 print(response.text)
 '''
 #Authorization through user-agent, currently sends out right, not sure about response
@@ -55,9 +52,6 @@ print(response_oauth.text)
 
 
 #attempt two
-heads_test = {"Content-Type" : "application/json", "X-Accept" : "application/json"}
-payload = {"client_id" : cid, "redirect_uri" : callback}
-
 class testForm(FlaskForm):
     submit = SubmitField("Connect to CB")
 
