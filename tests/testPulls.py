@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField
 from flask_oauthlib.client import OAuth
 from requests_oauthlib import OAuth2Session
+from flask.json import jsonify
 from oauthlib.oauth2 import BackendApplicationClient
 from requests.auth import HTTPBasicAuth
 
@@ -25,6 +26,7 @@ paramstwo = {
     'grant_type' : authc,
 }
 
+
 urlcheck = "https://sandbox.checkbook.io/v3/check"
 headers_one = {
   'Accept': 'application/json',
@@ -36,24 +38,36 @@ headers_two = {
   'Authorization': (apikey + ':' + apisecret)
 }
 
+res = requests.request("POST", req_url, headers = params)
+print(res.text)
+
 response = requests.request("GET", urlcheck, headers=headers_one)
 print(response.text)
-'''
+
 #Authorization through user-agent, currently sends out right, not sure about response
 oauth = OAuth2Session(cid, redirect_uri = callback, scope = 'check')
 authorization_url, state = oauth.authorization_url(req_url)
+redirect(authorization_url)
+print()
+
 response_oauth = requests.request("GET", authorization_url, headers = params)
 print ('Authorization_url: %s' % authorization_url)
 print('response_oauth is given as: %s' % response_oauth)
 print(response_oauth.text)
 # auth_resp = input(callback)
 # print(auth_resp)
-'''
+
 
 
 #attempt two
 class testForm(FlaskForm):
     submit = SubmitField("Connect to CB")
+
+@app.route('/authorize')
+def authorize():
+    cbook = OAuth2Session(cid, scope = 'check', redirect_uri = callback)
+
+    return
 
 @app.route('/')
 @app.route('/home', methods = ['GET', 'POST'])
