@@ -92,7 +92,18 @@ def callback():
     print('Entered callback and has been redirected to /callback on client side')
     cbook = OAuth2Session(cid, redirect_uri = callback, state = session['oauth_state'])
     print('Initializing cbook OAuth2Session seems to work okay')
-    token = cbook.fetch_token(urlToken, client_secret = (apikey + ':' + apisecret), authorization_response = request.url)
+    print('Initializing cbook OAuth2Session seems to work okay')
+    print('Initializing cbook OAuth2Session seems to work okay')
+    print(cbook)
+    print(request.url)
+    print('stripping request.url gives')
+    codebase = str(request.url)
+    print('code base given as: ' + codebase)
+    trash, acode = codebase.split("code=") #acode should now hold authorization code passed back in redirect uri
+    print('After splitting, acode = ' + acode)
+
+    #Figure out how to get token properly, currently broken 
+    token = cbook.fetch_token(urlToken, client_secret = acode, authorization_response = request.url)
     session['oauth_token'] = token
     flash('Successfully got token I think! lol...', 'success')
     return redirect(url_for('home'))
