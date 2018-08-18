@@ -56,7 +56,9 @@ print('response_oauth is given as: %s' % response_oauth)
 print(response_oauth.text)
 # auth_resp = input(callback)
 # print(auth_resp)
-
+# Supposedly included only for development side, once launched can remove this as it should be https 
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 #attempt two
@@ -65,9 +67,20 @@ class testForm(FlaskForm):
 
 @app.route('/authorize')
 def authorize():
-    cbook = OAuth2Session(cid, scope = 'check', redirect_uri = callback)
+    cbook = OAuth2Session(cid, scope = 'check')
+    authorization_url, state = cbook.authorization_url(req_url)
+    print(f'go to %s and authorize' % authorization_url)
+    session['oauth_state'] = state
+    return redirect(authorization_url)
 
-    return
+@app.route('/callback', methods = ["GET"])
+def callback():
+    print('Entered callback and has been redirected to /callback on client side')
+    cbook = OAuth2Session(cid, redirect_uri = callback, state = session['oauth_state'])
+    token = cbook.fetch_token(urlToken, client_secret = (apikey + ':' + apisecret), authorization_response = request.url)
+    session['oauth_token'] = token
+    flash('Successfully got token I think! lol...', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/')
 @app.route('/home', methods = ['GET', 'POST'])
@@ -76,7 +89,7 @@ def home():
     if form.validate_on_submit():
         print('validate_on_submit entered')
         flash('Submitted', 'success')
-        return redirect(authorization_url, code = 302);
+        return redirect(url_for('authorize'));
     return render_template('layout.html', title = 'Test', form = form)
 
 """
