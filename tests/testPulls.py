@@ -11,23 +11,10 @@ from oauthlib.oauth2 import BackendApplicationClient
 from requests.auth import HTTPBasicAuth
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] ='sZWjFJmyFQnzkVMxbFCTbByZNJhaJV' #setting secret key
+app.config['SECRET_KEY'] ='jwVUiHqbhGVmS44grYbHcTVbB9jDqy' #setting secret key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
-params = {
-    'client_id': cid,
-    'response_type': 'code',
-    'scope': 'check',
-    'redirect_uri': callback
-}
-
-paramstwo = {
-    'client_id' : cid,
-    'grant_type' : authc,
-}
-
-
-urlcheck = "https://sandbox.checkbook.io/v3/check"
+urlcheck = "https://checkbook.io/v3/check"
 headers_one = {
   'Accept': 'application/json',
   'Authorization': (apikey + ':' + apisecret)
@@ -73,6 +60,7 @@ import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
+
 #attempt two
 class testForm(FlaskForm):
     submit = SubmitField("Connect to CB")
@@ -85,7 +73,7 @@ def authorize():
     session['oauth_state'] = state
     return redirect(authorization_url)
 
-@app.route('/callback', methods = ["GET"])
+@app.route('/callback', methods = ["GET", "POST"])
 def callback():
     print('Entered callback and has been redirected to /callback on client side')
     print('Entered callback and has been redirected to /callback on client side')
@@ -96,17 +84,54 @@ def callback():
     print('Initializing cbook OAuth2Session seems to work okay')
     print(cbook)
     print(request.url)
-    print('stripping request.url gives')
     codebase = str(request.url)
     print('code base given as: ' + codebase)
     trash, acode = codebase.split("code=") #acode should now hold authorization code passed back in redirect uri
     print('After splitting, acode = ' + acode)
 
-    #Figure out how to get token properly, currently broken 
-    token = cbook.fetch_token(urlToken, client_secret = acode, authorization_response = request.url)
+    token_headers = {
+        'client_id' : cid,
+        'grant_type': acode,
+        'scope' : 'check',
+        'code' : acode,
+        'redirect_uri' : 'http://127.0.0.1:5000/callback',
+        'client_secret' : apisecret,
+        'Accept' : 'application/json'
+    }
+
+    tok_two = {
+        'client_id' : cid,
+        'grant_type': 'authorization_code',
+        'scope' : 'check',
+        'code' : acode,
+        'redirect_uri' : 'http://127.0.0.1:5000/callback',
+        'client_secret' : apisecret
+    }
+
+    print('Attempting to make a POST request using built token_headers to retrieve token')
+    print('Attempting to make a POST request using built token_headers to retrieve token')
+    response = requests.request("POST", urlToken, headers = token_headers)
+    print('POST request attempted and completed')
+    print(response.text)
+
+    response_two = requests.request("POST", urlToken, headers = tok_two)
+    print('Response two: ')
+    print(response_two.text)
+    print('making request with auth response: ' + str(request.url))
+    #Figure out how to get token properly, currently broken
+    token = cbook.fetch_token(urlToken, client_id = cid, scope = 'check', code = acode, client_secret = apisecret)
+    print(token)
+    print('Made it past first token request via fetch.token')
+    token_two = cbook.fetch_token(urlToken, client_secret = apisecret, authorization_response = request.url)
     session['oauth_token'] = token
     flash('Successfully got token I think! lol...', 'success')
     return redirect(url_for('home'))
+
+
+'''
+@app.route('/tokenexchange')
+def token_exchange():
+'''
 
 @app.route('/')
 @app.route('/home', methods = ['GET', 'POST'])
