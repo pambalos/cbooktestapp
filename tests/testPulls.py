@@ -38,13 +38,23 @@ headers_two = {
   'Authorization': (apikey + ':' + apisecret)
 }
 
+#POST and GET request to OAuth endpoint fails
+"""
 res = requests.request("POST", req_url, headers = params)
+print('Post request to req_ulr')
 print(res.text)
 
+res = requests.request("GET", req_url, headers = params)
+print('GET request to req_ulr')
+print(res.text)
+"""
+
+print('Get request sent to urlcheck receives info on Sneak Em Account')
 response = requests.request("GET", urlcheck, headers=headers_one)
 print(response.text)
 
 #Authorization through user-agent, currently sends out right, not sure about response
+"""
 oauth = OAuth2Session(cid, redirect_uri = callback, scope = 'check')
 authorization_url, state = oauth.authorization_url(req_url)
 redirect(authorization_url)
@@ -56,7 +66,9 @@ print('response_oauth is given as: %s' % response_oauth)
 print(response_oauth.text)
 # auth_resp = input(callback)
 # print(auth_resp)
-# Supposedly included only for development side, once launched can remove this as it should be https 
+"""
+
+# Supposedly included only for development side, once launched can remove this as it should be https
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -76,7 +88,10 @@ def authorize():
 @app.route('/callback', methods = ["GET"])
 def callback():
     print('Entered callback and has been redirected to /callback on client side')
+    print('Entered callback and has been redirected to /callback on client side')
+    print('Entered callback and has been redirected to /callback on client side')
     cbook = OAuth2Session(cid, redirect_uri = callback, state = session['oauth_state'])
+    print('Initializing cbook OAuth2Session seems to work okay')
     token = cbook.fetch_token(urlToken, client_secret = (apikey + ':' + apisecret), authorization_response = request.url)
     session['oauth_token'] = token
     flash('Successfully got token I think! lol...', 'success')
