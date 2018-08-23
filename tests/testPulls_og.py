@@ -25,6 +25,21 @@ headers_two = {
   'Authorization': (apikey + ':' + apisecret)
 }
 
+#POST and GET request to OAuth endpoint fails
+"""
+res = requests.request("POST", req_url, headers = params)
+print('Post request to req_ulr')
+print(res.text)
+
+res = requests.request("GET", req_url, headers = params)
+print('GET request to req_ulr')
+print(res.text)
+"""
+
+print('Get request sent to urlcheck receives info on Sneak Em Account')
+response = requests.request("GET", urlcheck, headers=headers_one)
+print(response.text)
+
 #Authorization through user-agent, currently sends out right, not sure about response
 """
 oauth = OAuth2Session(cid, redirect_uri = callback, scope = 'check')
@@ -52,9 +67,9 @@ class testForm(FlaskForm):
 
 @app.route('/authorize')
 def authorize():
-    cbook = OAuth2Session(cid, scope = ['check'])
+    cbook = OAuth2Session(cid, scope = 'check')
     authorization_url, state = cbook.authorization_url(req_url)
-    print('go to %s and authorize' % authorization_url)
+    print(f'go to %s and authorize' % authorization_url)
     session['oauth_state'] = state
     return redirect(authorization_url)
 
@@ -76,18 +91,18 @@ def callback():
 
     token_headers = {
         'client_id' : cid,
-        'grant_type': 'authorization_code',
-        'scope' : ['check'],
+        'grant_type': acode,
+        'scope' : 'check',
         'code' : acode,
         'redirect_uri' : 'http://127.0.0.1:5000/callback',
-        'client_secret' : apisecret,
+        'client_secret' : client_secret,
         'Accept' : 'application/json'
     }
 
     tok_two = {
         'client_id' : cid,
         'grant_type': 'authorization_code',
-        'scope' : ['check'],
+        'scope' : 'check',
         'code' : acode,
         'redirect_uri' : 'http://127.0.0.1:5000/callback',
         'client_secret' : apisecret
@@ -96,9 +111,20 @@ def callback():
     print('Attempting to make a POST request using built token_headers to retrieve token')
     print('Attempting to make a POST request using built token_headers to retrieve token')
 
-    response = requests.post(token_url, data=token_headers)
+    response = requests.post(token_url, json=token_headers)
     print('POST request attempted and completed')
     print(response.text)
+
+    response_two = requests.post(token_url, headers = tok_two)
+    print('Response two: ')
+    print(response_two.text)
+    print('making request with auth response: ' + str(request.url))
+    #Figure out how to get token properly, currently broken
+    token = cbook.fetch_token(urlToken, client_id = cid, scope = 'check', code = acode, client_secret = apisecret)
+    print(token)
+    print('Made it past first token request via fetch.token')
+    token_two = cbook.fetch_token(urlToken, client_secret = apisecret, authorization_response = request.url)
+    session['oauth_token'] = token
     flash('Successfully got token I think! lol...', 'success')
     return redirect(url_for('home'))
 
