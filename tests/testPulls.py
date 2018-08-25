@@ -40,11 +40,9 @@ print(response_oauth.text)
 # print(auth_resp)
 """
 
-# Supposedly included only for development side, once launched can remove this as it should be https
+#Needed to transport oauth info in http instead of https
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
-
 
 #attempt two
 class testForm(FlaskForm):
@@ -54,20 +52,32 @@ class testForm(FlaskForm):
 def authorize():
     cbook = OAuth2Session(cid, scope = ['check'])
     authorization_url, state = cbook.authorization_url(req_url)
-    print('go to %s and authorize' % authorization_url)
+    print('OAuth2Session auth_url: %s' % authorization_url)
     session['oauth_state'] = state
+    head = {
+        'client_id' : cid,
+        'response_type' : 'code',
+        'scope' : ['check'],
+        'redirect_uri' : callback
+    } #pointless header
+
+    aurl = requests.post(req_url, data = head) #doesnt work
+    print(aurl.url) # doesnt work
     return redirect(authorization_url)
 
 @app.route('/callback', methods = ["GET", "POST"])
 def callback():
+    print(request.url)
     print('Entered callback and has been redirected to /callback on client side')
     print('Entered callback and has been redirected to /callback on client side')
     print('Entered callback and has been redirected to /callback on client side')
+    '''
     cbook = OAuth2Session(cid, redirect_uri = callback, state = session['oauth_state'])
     print('Initializing cbook OAuth2Session seems to work okay')
     print('Initializing cbook OAuth2Session seems to work okay')
     print('Initializing cbook OAuth2Session seems to work okay')
     print(cbook)
+    '''
     print(request.url)
     codebase = str(request.url)
     print('code base given as: ' + codebase)
@@ -87,11 +97,15 @@ def callback():
     tok_two = {
         'client_id' : cid,
         'grant_type': 'authorization_code',
-        'scope' : ['check'],
+        'scope' : 'check',
         'code' : acode,
         'redirect_uri' : 'http://127.0.0.1:5000/callback',
         'client_secret' : apisecret
     }
+
+    #token = cbook.fetch_token(token_url, kwargs = tok_two, code = acode)
+    print('attempted using cbook oauth2session class')
+    print('attempted using cbook oauth2session class')
 
     print('Attempting to make a POST request using built token_headers to retrieve token')
     print('Attempting to make a POST request using built token_headers to retrieve token')
